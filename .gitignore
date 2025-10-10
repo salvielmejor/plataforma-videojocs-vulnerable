@@ -1,0 +1,6 @@
+data/uploads/
+data/backups/
+data/logs/
+config/database.php
+*.log
+*.bak
