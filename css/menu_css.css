@@ -1,0 +1,193 @@
+/* Fons i configuració base */
+body {
+  background: radial-gradient(circle at top left, #ff00cc, #3333ff, #00ffff);
+  font-family: 'Orbitron', sans-serif;
+  color: #fff;
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* 🎥 Fons de vídeo */
+#video-fondo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
+
+/* 🕶️ Capa fosca sobre el vídeo */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 30, 0.7);
+  z-index: -1;
+}
+
+/* 🟩 Menú superior */
+.menu-superior {
+  background-color: rgba(20, 20, 40, 0.9);
+  box-shadow: 0 0 20px #00ffff;
+  padding: 15px 0;
+  text-align: center;
+}
+
+.menu-superior nav a {
+  color: #00ffff;
+  text-decoration: none;
+  font-weight: bold;
+  margin: 0 25px;
+  transition: color 0.3s, text-shadow 0.3s;
+}
+
+.menu-superior nav a:hover {
+  color: #ff00cc;
+  text-shadow: 0 0 10px #ff00cc;
+}
+
+/* 🟣 Contenidor central amb els jocs */
+.panel-container {
+  background-color: rgba(20, 20, 40, 0.8);
+  border-radius: 20px;
+  box-shadow: 0 0 25px #00ffff;
+  padding: 40px;
+  text-align: center;
+  width: 80%;
+  max-width: 900px;
+  margin: 50px auto;
+}
+
+.panel-container h2 {
+  color: #00ffff;
+  text-shadow: 0 0 10px #ff00cc;
+  margin-bottom: 40px;
+  font-size: 1.8rem;
+}
+
+/* 🎮 Jocs */
+.jocs-container {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.joc {
+  background-color: rgba(46, 46, 78, 0.9);
+  border-radius: 12px;
+  box-shadow: 0 0 15px #ff00cc;
+  width: 220px;
+  padding: 15px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.joc img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.joc h3 {
+  color: #00ffff;
+  margin-top: 15px;
+  text-shadow: 0 0 8px #ff00cc;
+}
+
+.joc:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px #00ffff;
+}
+
+/* 🔴 Peu de pàgina */
+footer {
+  background-color: rgba(20, 20, 40, 0.9);
+  box-shadow: 0 0 15px #ff00cc;
+  text-align: center;
+  padding: 15px;
+  font-size: 0.9rem;
+  color: #00ffff;
+  border-top: 2px solid #ff00cc;
+}
+
+/* 🏆 Pàgina de rànquing */
+.ranking-container {
+  max-width: 1000px;
+  margin: 60px auto;
+}
+
+.ranking-total {
+  background-color: rgba(46, 46, 78, 0.9);
+  box-shadow: 0 0 20px #00ffff;
+  border-radius: 15px;
+  padding: 25px;
+  margin-bottom: 50px;
+}
+
+.ranking-total h3 {
+  color: #ff00cc;
+  text-shadow: 0 0 10px #ff00cc;
+  margin-bottom: 15px;
+}
+
+.ranking-total ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ranking-total li {
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #00ffff;
+  font-size: 0.95rem;
+}
+
+/* 🧩 Rànquings dels jocs individuals */
+.ranking-jocs {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 25px;
+  flex-wrap: wrap;
+}
+
+.ranking-jocs .ranking {
+  background-color: rgba(30, 30, 60, 0.85);
+  border-radius: 12px;
+  box-shadow: 0 0 15px #ff00cc;
+  width: 280px;
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ranking-jocs .ranking:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px #00ffff;
+}
+
+.ranking-jocs h3 {
+  color: #00ffff;
+  margin-bottom: 10px;
+  text-shadow: 0 0 8px #ff00cc;
+}
+
+.ranking-jocs ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.ranking-jocs li {
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+}

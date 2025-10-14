@@ -1,0 +1,63 @@
+body {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  background: radial-gradient(circle at center, #0f0c29, #302b63, #24243e);
+  color: white;
+  text-align: center;
+}
+
+#game {
+  padding: 20px;
+}
+
+#hud {
+  margin: 10px;
+  font-size: 20px;
+}
+
+#play-area {
+  position: relative;
+  width: 800px;
+  height: 500px;
+  margin: 20px auto;
+  background-color: #1e1e2f;
+  border: 2px solid #00ffff;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.monkey {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background-image: url('../img/monkey2.jpeg');
+  background-size: cover;
+}
+
+.banana {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background-image: url('../img/banana.png');
+  background-size: cover;
+  transition: transform 0.3s linear;
+}
+
+#start-btn {
+  padding: 10px 20px;
+  font-size: 18px;
+  background-color: #00ffff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#win-message {
+  font-size: 28px;
+  margin-top: 20px;
+  color: #00ff99;
+}
+
+.hidden {
+  display: none;
+}

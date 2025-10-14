@@ -1,0 +1,31 @@
+.logo-wrapper {
+  position: fixed;
+  top: 20px; 
+  left: 0;
+  width: 100%;
+  text-align: center;
+  z-index: 10;
+}
+
+#logo {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 100px;
+  background: linear-gradient(90deg, #ff00cc, #3333ff, #00ffff);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 5s ease infinite, floatLogo 3s ease-in-out infinite;
+  transition: transform 0.3s ease;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes floatLogo {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-50px); }
+  100% { transform: translateY(0); }
+}
