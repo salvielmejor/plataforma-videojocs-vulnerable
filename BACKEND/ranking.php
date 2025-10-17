@@ -16,7 +16,7 @@
     <nav>
       <a href="menu.php">Inici</a>
       <a href="perfil.php">Perfil</a>
-      <a href="https://www.google.com">Sortir de la sessió</a>
+      <a href="http://172.18.33.242/projecte_marcsalvi/">Sortir de la sessió</a>
     </nav>
   </header>
 

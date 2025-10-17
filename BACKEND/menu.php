@@ -12,11 +12,11 @@
     <nav>
       <a href="perfil.php">Perfil</a>
       <a href="ranking.php">Ranking</a>
-      <a href="https://www.google.com">Sortir de la sessió</a>
+      <a href="http://172.18.33.242/projecte_marcsalvi/">Sortir de la sessió</a>
     </nav>
   </header>
 
-  <!-- Contingut principal -->
+  
   <main class="panel-container">
     <h2>Tria el teu Joc</h2>
     <div class="jocs-container">
@@ -25,17 +25,17 @@
         <h3>JOC 1</h3>
       </div>
       <div class="joc">
-        <a href="joc2/joc.html"><img src="../img/monkey.png" alt="Joc 2"></a>
+        <a href="joc2/joc.html"><img src="../img/mono.jpg" alt="Joc 2"></a>
         <h3>JOC 2</h3>
       </div>
       <div class="joc">
-        <a href=""><img src="joc3.jpg" alt="Joc 3"></a>
+        <a href="joc3/index.html"><img src="../img/snakelogo.jpg" alt="Joc 3"></a>
         <h3>JOC 3</h3>
       </div>
     </div>
   </main>
 
-  <!-- Peu de pàgina -->
+ 
   <footer>
     <p>© 2025 Selecció de Joc - Tots els drets reservats</p>
   </footer>
