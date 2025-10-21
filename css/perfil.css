@@ -1,0 +1,271 @@
+/* ===== PERFIL ELEGANTE Y MODERNO ===== */
+
+/* Fondo de la página */
+body {
+  background: radial-gradient(circle at top left, #ff00cc, #3333ff, #00ffff);
+  background-attachment: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
+  font-family: 'Orbitron', sans-serif;
+  color: #fff;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+
+/* Asegurar que el background cubra toda la pantalla */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at top left, #ff00cc, #3333ff, #00ffff);
+  z-index: -3;
+}
+
+/* Vídeo de fondo */
+#video-fondo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  z-index: -3;
+  filter: brightness(0.6) contrast(1.2);
+}
+
+/* Overlay para el fondo */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 30, 0.7);
+  z-index: -1;
+}
+
+/* Contenedor principal */
+.perfil-container {
+  max-width: 1000px;
+  margin: 60px auto;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* Layout del contenido */
+.perfil-content {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  background-color: rgba(46, 46, 78, 0.9);
+  border-radius: 15px;
+  padding: 40px;
+  box-shadow: 0 0 20px #00ffff;
+  margin-bottom: 30px;
+}
+
+/* Foto de perfil */
+.perfil-foto {
+  flex-shrink: 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.perfil-foto img {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 3px solid #00ffff;
+  box-shadow: 
+    0 0 30px rgba(0, 255, 255, 0.4),
+    0 10px 30px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.perfil-foto img:hover {
+  transform: scale(1.05);
+  box-shadow: 
+    0 0 40px rgba(0, 255, 255, 0.6),
+    0 15px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Sección de datos */
+.perfil-dades {
+  flex: 1;
+  background-color: rgba(30, 30, 60, 0.85);
+  border-radius: 12px;
+  box-shadow: 0 0 15px #ff00cc;
+  padding: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.perfil-dades:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 25px #00ffff;
+}
+
+/* Información del usuario */
+.perfil-dades p {
+  margin: 0 0 25px 0;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.perfil-dades strong {
+  color: #00ffff;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.perfil-dades span {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: inline-block;
+  font-weight: 500;
+}
+
+/* Etiquetas de formulario */
+.perfil-dades label {
+  display: block;
+  color: #00ffff;
+  font-weight: 600;
+  margin: 25px 0 8px 0;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Campos de entrada */
+.perfil-dades input[type="text"],
+.perfil-dades input[type="email"],
+.perfil-dades input[type="password"],
+.perfil-dades input[type="file"] {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  margin-bottom: 5px;
+}
+
+.perfil-dades input[type="text"]:focus,
+.perfil-dades input[type="email"]:focus,
+.perfil-dades input[type="password"]:focus {
+  outline: none;
+  border-color: #00ffff;
+  background: rgba(0, 255, 255, 0.1);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+}
+
+.perfil-dades input[type="file"] {
+  border-style: dashed;
+  cursor: pointer;
+  text-align: center;
+}
+
+.perfil-dades input[type="file"]:hover {
+  border-color: #00ffff;
+  background: rgba(0, 255, 255, 0.05);
+}
+
+/* Botones */
+.perfil-dades button {
+  background: linear-gradient(135deg, #00ffff, #ff00cc);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 12px 24px;
+  margin: 20px 10px 0 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.perfil-dades button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 255, 255, 0.4);
+}
+
+.perfil-dades button:active {
+  transform: translateY(0);
+}
+
+/* Mensajes de estado */
+.perfil-dades p {
+  margin: 15px 0;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .perfil-content {
+    flex-direction: column;
+    gap: 30px;
+    padding: 30px;
+    align-items: center;
+  }
+  
+  .perfil-foto {
+    text-align: center;
+    order: -1;
+  }
+  
+  .perfil-foto img {
+    width: 180px;
+    height: 180px;
+  }
+  
+  .perfil-dades {
+    width: 100%;
+  }
+  
+  .perfil-dades button {
+    width: 100%;
+    margin: 10px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .perfil-container {
+    margin: 20px auto;
+  }
+  
+  .perfil-content {
+    padding: 20px;
+  }
+  
+  .perfil-foto img {
+    width: 120px;
+    height: 120px;
+  }
+}

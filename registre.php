@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     Tu navegador no soporta video HTML5.
   </video>
   <div class="logo-wrapper">
-    <h1 id="logo">MARC & SALVI LANDIA</h1>
+    <h1 id="logo"> POMASA LANDIA</h1>
   </div>
   <div class="overlay"></div>
   <div class="container">

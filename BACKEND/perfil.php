@@ -78,25 +78,16 @@ if ($resultado && $resultado->num_rows > 0) {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Perfil d'Usuari</title>
-    <link rel="stylesheet" href="../css/menu_css.css" />
+    <link rel="stylesheet" href="../css/header.css" />
+    <link rel="stylesheet" href="../css/sanitize.css" />
+    <link rel="stylesheet" href="../css/perfil.css" />
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
 </head>
 <body>
-    <video autoplay muted loop id="video-fondo">
-        <source src="fons.mp4" type="video/mp4" />
-    </video>
-    <div class="overlay"></div>
 
-    <header class="menu-superior">
-        <nav>
-            <a href="menu.php">Inici</a>
-            <a href="ranking.php">Ranking</a>
-            <a href="http://172.18.33.242/projecte_marcsalvi/">Sortir de la sessió</a>
-        </nav>
-    </header>
+    <?php include 'header.php'; ?>
 
     <main class="panel-container perfil-container">
-        <h2>Perfil d'Usuari</h2>
 
         <div class="perfil-content">
             <div class="perfil-foto">
@@ -127,7 +118,7 @@ if ($resultado && $resultado->num_rows > 0) {
                     <input type="file" name="foto" id="foto" accept="image/*" /><br/><br/>
 
                     <button type="submit" name="actualizar_datos">Actualitzar dades</button>
-                    <button type="submit" name="subir_foto">Pujar foto</button>
+                    <button type="submit" name="subir_foto">Eliminar Perfil</button>
                 </form>
 
                 <?php 

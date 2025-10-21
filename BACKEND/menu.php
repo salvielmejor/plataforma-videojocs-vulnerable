@@ -5,18 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Selecció de Joc</title>
   <link rel="stylesheet" href="../css/menu_css.css">
+  <link rel="stylesheet" href="../css/header.css" />
+  <link rel="stylesheet" href="../css/sanitize.css" />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header class="menu-superior">
-    <nav>
-      <a href="perfil.php">Perfil</a>
-      <a href="ranking.php">Ranking</a>
-      <a href="http://172.18.33.242/projecte_marcsalvi/">Sortir de la sessió</a>
-    </nav>
-  </header>
+  <?php include 'header.php'; ?>
 
-  
   <main class="panel-container">
     <h2>Tria el teu Joc</h2>
     <div class="jocs-container">
@@ -25,20 +20,22 @@
         <h3>JOC 1</h3>
       </div>
       <div class="joc">
-        <a href="joc2/joc.html"><img src="../img/mono.jpg" alt="Joc 2"></a>
+        <a href="joc2/joc.php"><img src="../img/start.png" alt="Joc 2"></a>
         <h3>JOC 2</h3>
       </div>
       <div class="joc">
-        <a href="joc3/index.html"><img src="../img/snakelogo.jpg" alt="Joc 3"></a>
+        <a href="joc3/index.php"><img src="../img/snakelogo.jpg" alt="Joc 3"></a>
         <h3>JOC 3</h3>
+      </div>
+      <div class="joc">
+        <a href="joc4/index.php"><img src="../img/fruit.png" alt="Joc 4"></a>
+        <h3>JOC 4</h3>
       </div>
     </div>
   </main>
 
- 
   <footer>
-    <p>© 2025 Selecció de Joc - Tots els drets reservats</p>
+    <p>© 2025 POMASA MI MASSA - Tots els drets reservats</p>
   </footer>
-
 </body>
 </html>

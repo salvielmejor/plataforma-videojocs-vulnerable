@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </video>
   <div class="overlay"></div>
   <div class="logo-wrapper">
-    <h1 id="logo">MARC & SALVI LANDIA</h1>
+    <h1 id="logo">POMASA LANDIA</h1>
   </div>
 
   <script src="js/logo.js"></script>

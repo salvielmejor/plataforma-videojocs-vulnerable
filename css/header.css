@@ -1,0 +1,246 @@
+/* ===== ESTILOS PROFESIONALES PARA HEADER ===== */
+
+/* 🟩 Menú superior profesional */
+.menu-superior {
+  background-color: rgba(20, 20, 40, 0.9);
+  box-shadow: 0 0 20px #00ffff;
+  padding: 15px 0;
+  text-align: center;
+  border-bottom: 2px solid #00ffff;
+  margin-bottom: 20px;
+}
+
+/* Navegación */
+.menu-superior nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+/* Marca/Logo */
+.nav-brand {
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+}
+
+.brand-name {
+  color: #00ffff !important;
+  text-decoration: none !important;
+  font-weight: 700 !important;
+  font-size: 1.3rem !important;
+  text-shadow: 0 0 15px #00ffff !important;
+  text-transform: uppercase !important;
+  letter-spacing: 2px !important;
+  border: none !important;
+  background: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  transition: all 0.3s ease !important;
+}
+
+.brand-name:hover {
+  color: #ff00cc !important;
+  text-shadow: 0 0 20px #ff00cc !important;
+  transform: scale(1.05) !important;
+}
+
+/* Estilos para el h2 del nombre de la web */
+.nav-brand h2 {
+  color: #00ffff;
+  font-weight: 700;
+  font-size: 1.3rem;
+  text-shadow: 0 0 15px #00ffff;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 0;
+  padding: 0;
+  transition: all 0.3s ease;
+}
+
+.nav-brand h2:hover {
+  color: #ff00cc;
+  text-shadow: 0 0 20px #ff00cc;
+  transform: scale(1.05);
+}
+
+/* Navegación central */
+.nav-center {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+}
+
+/* Navegación derecha */
+.nav-right {
+  display: flex;
+  align-items: center;
+}
+
+/* Enlaces del menú */
+.menu-superior nav a {
+  color: #00ffff;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.1rem;
+  padding: 10px 20px;
+  margin: 0 10px;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  background: rgba(0, 255, 255, 0.1);
+  border: 2px solid transparent;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+}
+
+/* Efectos hover */
+.menu-superior nav a:hover {
+  color: #ff00cc;
+  text-shadow: 0 0 10px #ff00cc;
+  background: rgba(255, 0, 204, 0.15);
+  border-color: #ff00cc;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 0, 204, 0.3);
+}
+
+/* Estado activo - página actual */
+.menu-superior nav a.active {
+  color: #ffffff;
+  background: rgba(255, 0, 204, 0.3);
+  border-color: #ff00cc;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+  box-shadow: 
+    0 0 20px rgba(255, 0, 204, 0.6),
+    inset 0 0 10px rgba(255, 0, 204, 0.2);
+  transform: translateY(-1px);
+  font-weight: 700;
+}
+
+/* Efecto de focus para accesibilidad */
+.menu-superior nav a:focus {
+  outline: none;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+  border-color: #00ffff;
+}
+
+/* Botón de logout */
+.logout-btn {
+  color: #ff6b6b !important;
+  border-color: #ff6b6b !important;
+  background: rgba(255, 107, 107, 0.1) !important;
+  text-shadow: 0 0 8px rgba(255, 107, 107, 0.5) !important;
+}
+
+.logout-btn:hover {
+  color: #ff4757 !important;
+  border-color: #ff4757 !important;
+  background: rgba(255, 71, 87, 0.2) !important;
+  box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4) !important;
+  text-shadow: 0 0 12px rgba(255, 71, 87, 0.8) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .menu-superior nav {
+    gap: 25px;
+  }
+  
+  .menu-superior nav a {
+    font-size: 1rem;
+    padding: 8px 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .menu-superior {
+    padding: 12px 0;
+  }
+  
+  .menu-superior nav {
+    gap: 20px;
+    flex-direction: column;
+  }
+  
+  .nav-brand {
+    order: 1;
+  }
+  
+  .nav-center {
+    gap: 20px;
+    flex-direction: column;
+    order: 2;
+  }
+  
+  .nav-right {
+    order: 3;
+    margin-top: 10px;
+  }
+  
+  .brand-name {
+    font-size: 1.1rem !important;
+  }
+  
+  .menu-superior nav a {
+    font-size: 0.95rem;
+    padding: 10px 20px;
+    width: 200px;
+    text-align: center;
+    margin: 5px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .menu-superior nav a {
+    font-size: 0.9rem;
+    padding: 8px 16px;
+    width: 180px;
+  }
+}
+
+/* Estilos para diferentes estados del header */
+.menu-superior.compact {
+  padding: 10px 0;
+  margin-bottom: 15px;
+}
+
+.menu-superior.compact nav {
+  gap: 20px;
+}
+
+.menu-superior.compact nav a {
+  font-size: 0.95rem;
+  padding: 8px 16px;
+}
+
+/* Estilos para modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .menu-superior {
+    background-color: rgba(10, 10, 25, 0.95);
+  }
+}
+
+/* Estilos para impresión */
+@media print {
+  .menu-superior {
+    background: #f5f5f5;
+    border-bottom: 2px solid #333;
+    box-shadow: none;
+    padding: 10px 0;
+  }
+  
+  .menu-superior nav a {
+    color: #333;
+    border: 1px solid #333;
+    background: transparent;
+    text-shadow: none;
+  }
+  
+  .menu-superior nav a.active {
+    background: #333;
+    color: #fff;
+  }
+}
