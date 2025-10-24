@@ -11,12 +11,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $usuario = $_POST["username"];
   $contrasena = $_POST["password"];
 
-  // Consulta sin hash ni protección contra SQL injection
-  $sql = "SELECT * FROM usuaris WHERE nom_usuari='$usuario' AND password_hash='$contrasena'";
-  $resultado = $conexion->query($sql);
+  // Consulta usando prepared statement para evitar inyección SQL
+  $sql = "SELECT * FROM usuaris WHERE nom_usuari=? AND password_hash=?";
+  $stmt = $conexion->prepare($sql);
+  $stmt->bind_param("ss", $usuario, $contrasena);  // Aquí comparación directa sin hash
+  $stmt->execute();
+  $resultado = $stmt->get_result();
 
   if ($resultado && $resultado->num_rows > 0) {
-    $_SESSION["usuario"] = $usuario;
+    $row = $resultado->fetch_assoc();
+    // Guardar datos en sesión
+    $_SESSION["usuario"] = $row["nom_usuari"];
+    $_SESSION["usuari_id"] = $row["id"];
+
     header("Location: BACKEND/menu.php");
     exit();
   } else {
@@ -24,7 +31,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -42,9 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <div class="logo-wrapper">
     <h1 id="logo">POMASA LANDIA</h1>
   </div>
-
   <script src="js/logo.js"></script>
-
   <div class="container">
     <h2>Plataforma Gamer</h2>
     <form method="POST">

@@ -18,6 +18,7 @@
             <p>Corta las frutas con el cursor</p>
             <p>¡No dejes que caigan!</p>
         </div>
+        <button class="btn btn-menu-selector" onclick="goToMainMenu()">🎮 Menú de Juegos</button>
     </div>
 
     <div id="game" class="game hidden">
@@ -36,7 +37,10 @@
     <div id="gameOver" class="game-over hidden">
         <h1>¡GAME OVER!</h1>
         <p class="final-score">Puntuación Final: <span id="finalScore">0</span></p>
-        <button class="btn btn-restart" onclick="backToMenu()">Volver al Menú</button>
+        <div class="game-over-buttons">
+            <button class="btn btn-restart" onclick="backToMenu()">Volver al Menú</button>
+            <button class="btn btn-menu-selector" onclick="goToGameSelector()">🎮 Selector de Juegos</button>
+        </div>
     </div>
 
     <script src="../../js/joc4.js"></script>

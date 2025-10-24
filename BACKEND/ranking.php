@@ -1,5 +1,10 @@
 <?php
-// Connexió a la base de dades
+session_start();
+if (!isset($_SESSION['usuari_id'])) {
+  header("Location: ../index.php");
+  exit();
+}
+
 $host = 'localhost';
 $user = 'plataforma_user';
 $pass = '123456789a';
@@ -10,7 +15,7 @@ if ($conn->connect_error) {
     die("Error de connexió: " . $conn->connect_error);
 }
 
-// --- RÀNQUING GLOBAL (suma de puntuacions màximes per usuari) ---
+// Ranking global
 $sql_global = "
     SELECT u.nom_usuari, SUM(pu.puntuacio_maxima) AS total_punts
     FROM progres_usuari pu
@@ -21,7 +26,7 @@ $sql_global = "
 ";
 $result_global = $conn->query($sql_global);
 
-// --- RÀNQUING PER JOC (TOP 10 per joc) ---
+// Ranking por juego
 $sql_jocs = "SELECT id, nom_joc FROM jocs WHERE actiu = 1;";
 $result_jocs = $conn->query($sql_jocs);
 
@@ -58,58 +63,54 @@ $conn->close();
 <!DOCTYPE html>
 <html lang="ca">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
   <title>Rànquing de Jugadors</title>
-  <link rel="stylesheet" href="../css/menu_css.css">
+  <link rel="stylesheet" href="../css/menu_css.css" />
   <link rel="stylesheet" href="../css/header.css" />
   <link rel="stylesheet" href="../css/sanitize.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
 </head>
 <body>
 
-  <?php include 'header.php'; ?>
+<?php include 'header.php'; ?>
 
-  <!-- Panell de ranking -->
-  <main class="panel-container ranking-container">
-    <h2>Rànquing Global</h2>
+<main class="panel-container ranking-container">
+  <h2>Rànquing Global</h2>
 
-    <section class="ranking ranking-total">
-      <h3>TOP 10 GLOBAL</h3>
-      <ol>
-        <?php if ($result_global->num_rows > 0): ?>
-          <?php while ($row = $result_global->fetch_assoc()): ?>
-            <li><?= htmlspecialchars($row['nom_usuari']) ?> — <?= number_format($row['total_punts'], 0, ',', '.') ?> pts</li>
-          <?php endwhile; ?>
-        <?php else: ?>
-          <li>No hi ha dades disponibles.</li>
-        <?php endif; ?>
-      </ol>
-    </section>
+  <section class="ranking ranking-total">
+    <h3>TOP 10 GLOBAL</h3>
+    <ol>
+      <?php if ($result_global->num_rows > 0): ?>
+        <?php while ($row = $result_global->fetch_assoc()): ?>
+          <li><?= htmlspecialchars($row['nom_usuari']) ?> — <?= number_format($row['total_punts'], 0, ',', '.') ?> pts</li>
+        <?php endwhile; ?>
+      <?php else: ?>
+        <li>No hi ha dades disponibles.</li>
+      <?php endif; ?>
+    </ol>
+  </section>
 
-    <!-- Rànquings per jocs -->
-    <div class="ranking-jocs">
-      <?php foreach ($jocs as $joc): ?>
-        <section class="ranking joc">
-          <h3><?= htmlspecialchars($joc['nom']) ?></h3>
-          <ol>
-            <?php if (!empty($joc['ranking'])): ?>
-              <?php foreach ($joc['ranking'] as $r): ?>
-                <li><?= htmlspecialchars($r['nom_usuari']) ?> — <?= number_format($r['puntuacio_maxima'], 0, ',', '.') ?> pts</li>
-              <?php endforeach; ?>
-            <?php else: ?>
-              <li>No hi ha dades per a aquest joc.</li>
-            <?php endif; ?>
-          </ol>
-        </section>
-      <?php endforeach; ?>
-    </div>
-  </main>
+  <div class="ranking-jocs">
+    <?php foreach ($jocs as $joc): ?>
+      <section class="ranking joc">
+        <h3><?= htmlspecialchars($joc['nom']) ?></h3>
+        <ol>
+          <?php if (!empty($joc['ranking'])): ?>
+            <?php foreach ($joc['ranking'] as $r): ?>
+              <li><?= htmlspecialchars($r['nom_usuari']) ?> — <?= number_format($r['puntuacio_maxima'], 0, ',', '.') ?> pts</li>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <li>No hi ha dades per a aquest joc.</li>
+          <?php endif; ?>
+        </ol>
+      </section>
+    <?php endforeach; ?>
+  </div>
+</main>
 
-  <!-- Peu de pàgina -->
-  <footer>
-    <p>© 2025 Plataforma de Videojocs - Rànquing</p>
-  </footer>
+<footer>
+  <p>© 2025 Plataforma de Videojocs - Rànquing</p>
+</footer>
 
 </body>
 </html>

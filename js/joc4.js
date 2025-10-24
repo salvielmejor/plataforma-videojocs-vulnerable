@@ -57,9 +57,11 @@ function backToMenu() {
 }
 
 function goToGameSelector() {
-    // Redirige a la página principal del selector de juegos
-    // Cambia 'index.php' por la ruta correcta de tu menú principal
-    window.location.href = '../menu.php';
+    window.location.href = 'http://172.18.33.242/projecte_marcsalvi/BACKEND/menu.php';
+}
+
+function goToMainMenu() {
+    window.location.href = 'http://172.18.33.242/projecte_marcsalvi/BACKEND/menu.php';
 }
 
 function startSpawning() {
@@ -81,11 +83,15 @@ function spawnFruit() {
     const fruitIndex = Math.floor(Math.random() * fruitEmojis.length);
     const config = difficulties[gameState.difficulty];
     
+    // Asegurar que la fruta aparece dentro del canvas con margen
+    const margin = 60;
+    const startX = Math.random() * (canvas.width - margin * 2) + margin;
+    
     const fruit = {
-        x: Math.random() * (canvas.width - 60) + 30,
+        x: startX,
         y: canvas.height + 50,
-        vx: (Math.random() - 0.5) * 4,
-        vy: -(Math.random() * 3 + 8 + config.fruitSpeed),
+        vx: (Math.random() - 0.5) * 2.5, // Velocidad horizontal reducida
+        vy: -(Math.random() * 6 + 10+ config.fruitSpeed * 2), // Mucha más velocidad vertical (14-26)
         size: 40,
         emoji: fruitEmojis[fruitIndex],
         color: fruitColors[fruitIndex],
@@ -136,7 +142,7 @@ function gameLoop() {
         const fruit = gameState.fruits[i];
         
         if (!fruit.sliced) {
-            fruit.vy += 0.3; // gravedad
+            fruit.vy += 0.25; // Gravedad reducida para alcanzar más altura
             fruit.x += fruit.vx;
             fruit.y += fruit.vy;
             fruit.rotation += fruit.rotationSpeed;
@@ -151,10 +157,17 @@ function gameLoop() {
             ctx.fillText(fruit.emoji, 0, 0);
             ctx.restore();
             
-            // Comprobar si cayó
-            if (fruit.y > canvas.height + 100) {
+            // Comprobar si cayó (más allá del borde inferior) o salió de los lados
+            const outOfBoundsBottom = fruit.y > canvas.height + 100;
+            const outOfBoundsLeft = fruit.x < -50;
+            const outOfBoundsRight = fruit.x > canvas.width + 50;
+            
+            if (outOfBoundsBottom || outOfBoundsLeft || outOfBoundsRight) {
                 gameState.fruits.splice(i, 1);
-                loseLife();
+                // Solo perder vida si cayó por abajo, no por los lados
+                if (outOfBoundsBottom) {
+                    loseLife();
+                }
             }
         } else {
             gameState.fruits.splice(i, 1);

@@ -1,33 +1,27 @@
 <?php
 session_start();
-// Suposem que ja tens una sessió oberta amb l'usuari autenticat.
-// Exemple: $_SESSION['usuari_id'] i $_SESSION['nom_usuari']
 if (!isset($_SESSION['usuari_id'])) {
-    $_SESSION['usuari_id'] = 1; // valor per defecte per proves
+  header("Location: ../login.php");
+  exit();
 }
 ?>
 <!DOCTYPE html>
 <html lang="ca">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atrapa les Estrelles</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../../css/estrella.css">
+  <meta charset="UTF-8" />
+  <title>Atrapa les Estrelles</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/estrella.css">
 </head>
 <body>
-    <!-- Fons de vídeo -->
-    <video id="video-fondo" autoplay loop muted>
-        <source src="video/fondo.mp4" type="video/mp4">
-    </video>
-    <div class="overlay"></div>
-
-    <!-- Logo -->
-    <div class="logo-wrapper">
-        <h1 id="logo">⭐ Atrapa les Estrelles ⭐</h1>
-    </div>
-
-    <div id="gameContainer">
+  <video id="video-fondo" autoplay loop muted>
+    <source src="video/fondo.mp4" type="video/mp4">
+  </video>
+  <div class="overlay"></div>
+  <div class="logo-wrapper">
+    <h1 id="logo">⭐ Atrapa les Estrelles ⭐</h1>
+  </div>
+  <div id="gameContainer">
         <div id="menuScreen" class="panel-container">
             <h2>Selecciona la dificultat:</h2>
             <div class="jocs-container">
@@ -51,6 +45,7 @@ if (!isset($_SESSION['usuari_id'])) {
     </div>
 
     <script>
+        const usuari_id = <?php echo $_SESSION['usuari_id']; ?>;
         const config = {
             "facil": { "velocitat": 1, "freq": 1500, "tamany": 80, "temps": 60, "punts": 5 },
             "mitja": { "velocitat": 3, "freq": 1000, "tamany": 60, "temps": 40, "punts": 15 },
@@ -115,7 +110,7 @@ if (!isset($_SESSION['usuari_id'])) {
             const joc_id = 1; // ID del joc Atrapa les Estrelles
             const durada = currentConfig.temps;
 
-            fetch('guardar_partida.php', {
+            fetch('/projecte_marcsalvi/BACKEND/joc2/guardar.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

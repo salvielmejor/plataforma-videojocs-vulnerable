@@ -9,6 +9,7 @@ let score = 0;
 let level = 1;
 let speed = 100;
 let particles = [];
+let gameActive = true;
 
 const scoreEl = document.getElementById("score");
 const levelEl = document.getElementById("level");
@@ -63,7 +64,9 @@ function drawFood() {
 }
 
 function drawParticles() {
-  particles.forEach((p, i) => {
+  // Optimización: usar for loop en lugar de forEach para mejor rendimiento
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
     ctx.fillStyle = `rgba(255,255,0,${p.alpha})`;
     ctx.beginPath();
     ctx.arc(p.x, p.y, 2 + (1 - p.alpha) * 3, 0, Math.PI * 2);
@@ -71,12 +74,16 @@ function drawParticles() {
     p.x += p.vx;
     p.y += p.vy;
     p.alpha -= 0.02;
-    if (p.alpha <= 0) particles.splice(i, 1);
-  });
+    if (p.alpha <= 0) {
+      particles.splice(i, 1);
+    }
+  }
 }
 
 function spawnParticles(x, y) {
-  for (let i = 0; i < 10; i++) {
+  // Optimización: limitar número de partículas para mejor rendimiento
+  const maxParticles = Math.min(8, 15 - particles.length);
+  for (let i = 0; i < maxParticles; i++) {
     particles.push({
       x, y,
       vx: (Math.random() - 0.5) * 4,
@@ -93,6 +100,8 @@ function updateStats() {
 }
 
 function draw() {
+  if (!gameActive) return;
+  
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawParticles();
   drawFood();
@@ -120,19 +129,112 @@ function draw() {
     head.y < 0 || head.y >= canvas.height ||
     snake.slice(1).some(s => s.x === head.x && s.y === head.y)
   ) {
-    alert("💀 Game Over\nPuntuación: " + score);
-    snake = [{ x: 200, y: 200 }];
-    direction = { x: 0, y: 0 };
-    score = 0;
-    level = 1;
-    speed = 100;
-    food = randomPosition();
-    clearInterval(gameLoop);
-    gameLoop = setInterval(draw, speed);
+    gameOver();
+    return;
   }
-
+  
   snake.forEach((s, i) => drawSegment(s.x, s.y, i));
   updateStats();
 }
 
 let gameLoop = setInterval(draw, speed);
+
+// Función para manejar el fin del juego
+function gameOver() {
+  gameActive = false;
+  clearInterval(gameLoop);
+  
+  // Mostrar pantalla de game over
+  const gameOverDiv = document.getElementById('gameOver');
+  const finalScoreEl = document.getElementById('finalScore');
+  finalScoreEl.textContent = `Puntuación Final: ${score}`;
+  gameOverDiv.style.display = 'block';
+  
+  // Guardar puntuación en la base de datos
+  saveScore(score);
+}
+
+// Función para guardar la puntuación
+async function saveScore(finalScore) {
+  console.log('Intentando guardar puntuación:', finalScore);
+  console.log('Usuario ID:', usuarioId);
+  
+  // Verificar si hay usuario logueado
+  if (!usuarioId || usuarioId === 0) {
+    alert('⚠️ No estás logueado. Por favor, inicia sesión para guardar tu puntuación.');
+    return;
+  }
+
+  try {
+    console.log('Enviando datos:', {
+      usuari_id: usuarioId,
+      joc_id: 3,
+      puntuacio: finalScore
+    });
+
+    const response = await fetch('guardar.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        usuari_id: usuarioId,
+        joc_id: 3,
+        puntuacio: finalScore
+      })
+    });
+    
+    console.log('Respuesta recibida:', response.status);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    console.log('Resultado:', result);
+    
+    if (result.status === 'ok') {
+      console.log('✅ Puntuación guardada:', result.message);
+      if (result.message === 'Nueva puntuación máxima!') {
+        alert(`¡${result.message}\nPuntuación: ${result.puntuacion}`);
+        // Actualizar la mejor puntuación mostrada
+        const bestElement = document.getElementById('best');
+        if (bestElement) {
+          bestElement.textContent = `Mejor: ${result.puntuacion}`;
+        }
+      } else {
+        alert(`✅ ${result.message}`);
+      }
+    } else {
+      console.error('❌ Error al guardar puntuación:', result.message);
+      alert('❌ Error al guardar la puntuación: ' + result.message);
+    }
+  } catch (error) {
+    console.error('❌ Error de conexión:', error);
+    alert('❌ Error de conexión: ' + error.message);
+  }
+}
+
+// Función para reiniciar el juego
+function restartGame() {
+  const gameOverDiv = document.getElementById('gameOver');
+  gameOverDiv.style.display = 'none';
+  
+  // Reiniciar variables del juego
+  gameActive = true;
+  snake = [{ x: 200, y: 200 }];
+  direction = { x: 0, y: 0 };
+  score = 0;
+  level = 1;
+  speed = 100;
+  food = randomPosition();
+  particles = [];
+  
+  // Limpiar canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  // Reiniciar el loop del juego
+  clearInterval(gameLoop);
+  gameLoop = setInterval(draw, speed);
+}
+

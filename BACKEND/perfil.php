@@ -130,7 +130,7 @@ if ($resultado && $resultado->num_rows > 0) {
     </main>
 
     <footer>
-        <p>© 2025 Selecció de Joc - Perfil d'Usuari</p>
+        <p>© 2025 POMASA MI MASSA - Tots els drets reservats</p>
     </footer>
 </body>
 </html>
