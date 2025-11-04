@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/session.php';
 // Detectar la página actual para mostrar el nav apropiado
 $current_page = basename($_SERVER['PHP_SELF']);
 $is_backend_page = strpos($_SERVER['REQUEST_URI'], '/BACKEND/') !== false;
@@ -17,7 +18,7 @@ $is_backend_page = strpos($_SERVER['REQUEST_URI'], '/BACKEND/') !== false;
                 <a href="ranking.php" class="<?php echo ($current_page == 'ranking.php') ? 'active' : ''; ?>">Ranking</a>
             </div>
             <div class="nav-right">
-                <a href="../index.php" class="logout-btn">Sortir</a>
+                <a href="logout.php" class="logout-btn">Sortir</a>
             </div>
         <?php else: ?>
             <!-- Nav para páginas públicas -->

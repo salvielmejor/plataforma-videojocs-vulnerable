@@ -2,6 +2,13 @@
 session_start();
 header('Content-Type: application/json');
 
+// Requiere usuario logueado
+if (!isset($_SESSION['usuario'])) {
+    http_response_code(401);
+    echo json_encode(["success" => false, "message" => "No hay sesión iniciada"]);
+    exit;
+}
+
 // Configuración de base de datos
 $host = "localhost";
 $dbname = "plataforma_videojocs";
@@ -27,23 +34,17 @@ if (!$data) {
 $puntuacio = intval($data["puntuacio"] ?? 0);
 $nivell_jugat = intval($data["nivell_id"] ?? 1);
 
-// Obtener el ID del usuario
-if (isset($_SESSION["usuari_id"])) {
-    $usuari_id = $_SESSION["usuari_id"];
-} else {
-    // Crear usuario "Visitant" si no existe
-    $stmt = $pdo->prepare("SELECT id FROM usuaris WHERE nom_usuari = 'Visitant'");
-    $stmt->execute();
-    $usuari = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($usuari) {
-        $usuari_id = $usuari["id"];
-    } else {
-        $stmt = $pdo->prepare("INSERT INTO usuaris (nom_usuari, email, password_hash) VALUES ('Visitant', 'visitant@example.com', '')");
-        $stmt->execute();
-        $usuari_id = $pdo->lastInsertId();
-    }
+// Obtener el ID del usuario desde la sesión (nombre de usuario)
+$nomUsuari = $_SESSION['usuario'];
+$stmt = $pdo->prepare("SELECT id FROM usuaris WHERE nom_usuari = ?");
+$stmt->execute([$nomUsuari]);
+$row = $stmt->fetch(PDO::FETCH_ASSOC);
+if (!$row) {
+    http_response_code(401);
+    echo json_encode(["success" => false, "message" => "Usuario de sesión no válido"]);
+    exit;
 }
+$usuari_id = (int)$row['id'];
 
 // Obtener el ID del juego (Fruit Ninja)
 $stmt = $pdo->prepare("SELECT id FROM jocs WHERE nom_joc = 'Fruit Ninja'");

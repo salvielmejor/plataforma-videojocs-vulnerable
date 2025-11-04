@@ -1,44 +1,65 @@
-body {
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+* {
   margin: 0;
-  font-family: 'Press Start 2P', cursive;
-  background: radial-gradient(circle at center, #1a1a1a, #000);
-  color: #fff;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Orbitron', sans-serif;
+  background: radial-gradient(circle at center, #0f0c29, #302b63, #24243e);
+  min-height: 100vh;
+  color: #ffffff;
   text-align: center;
 }
 
 .container {
-  padding: 20px;
-}
-
-h1 {
-  font-size: 2em;
-  color: #ff3cac;
-  text-shadow: 2px 2px #000;
-}
-
-canvas {
-  background: linear-gradient(145deg, #1a1a1a, #000);
-  border: 10px solid #333;
-  box-shadow: inset 0 0 30px #000, 0 0 20px #ff3cac;
-  border-radius: 10px;
-}
-
-.stats {
-  margin: 10px 0;
-  font-size: 0.8em;
+  min-height: 100vh;
   display: flex;
-  justify-content: space-around;
-  color: #f7b733;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
 }
 
-/* Estilos para el header con controles */
+/* Título con efecto de degradado y flotación */
+h1 {
+  font-size: 4.5rem;
+  font-weight: 900;
+  margin-bottom: 3rem;
+  background: linear-gradient(90deg, #ff00cc, #3333ff, #00ffff);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 5s ease infinite, floatLogo 3s ease-in-out infinite;
+  text-shadow: 0 0 30px rgba(255, 0, 204, 0.5);
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes floatLogo {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
+/* Header con botón de menú */
 .header-controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 12px;
+  width: 100%;
+  max-width: 800px;
 }
 
 .header-controls h1 {
@@ -47,46 +68,118 @@ canvas {
   min-width: 200px;
 }
 
-/* Botón de menú */
 .menu-btn {
-  background: linear-gradient(145deg, #ff3cac, #ff6b6b);
-  border: none;
-  color: white;
-  padding: 12px 20px;
-  font-family: 'Press Start 2P', cursive;
-  font-size: 0.6em;
-  border-radius: 8px;
+  background: linear-gradient(to right, #ff00cc, #3333ff);
+  border: 2px solid #00ffff;
+  color: #ffffff;
+  padding: 1rem 2.5rem;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  border-radius: 12px;
   cursor: pointer;
-  text-shadow: 1px 1px #000;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
 .menu-btn:hover {
-  background: linear-gradient(145deg, #ff6b6b, #ff3cac);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+  transform: scale(1.08);
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
 }
 
-.menu-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+/* Tarjetas de estadísticas con look neon */
+.stats {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 800px;
+  margin: 1.5rem 0;
 }
 
-/* Responsive design */
-@media (max-width: 600px) {
+.stats span {
+  background: rgba(20, 20, 40, 0.9);
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #00ffff;
+  text-shadow: 0 0 10px #ff00cc;
+  border: 2px solid #00ffff;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+/* Canvas con borde y sombra neon */
+canvas {
+  background: rgba(30, 30, 47, 0.8);
+  border-radius: 15px;
+  border: 3px solid #00ffff;
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+}
+
+/* Game Over */
+#gameOver {
+  margin-top: 16px;
+}
+
+#gameOver h2 {
+  font-size: 2rem;
+  margin-bottom: 8px;
+  background: linear-gradient(90deg, #ff00cc, #3333ff, #00ffff);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 20px rgba(255, 0, 204, 0.6);
+}
+
+#gameOver p {
+  font-size: 1.2rem;
+  color: #00ffff;
+  text-shadow: 0 0 12px #00ffff;
+}
+
+#gameOver button {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.3), rgba(126, 34, 206, 0.3));
+  border: 2px solid #9333ea;
+  color: #ffffff;
+  padding: 12px 24px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 0 16px rgba(147, 51, 234, 0.4);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  margin: 6px 6px 0;
+  text-transform: uppercase;
+}
+
+#gameOver button:hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 24px rgba(147, 51, 234, 0.8);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  h1 {
+    font-size: 3rem;
+  }
   .header-controls {
     flex-direction: column;
-    text-align: center;
+    align-items: center;
+    gap: 8px;
   }
-  
-  .header-controls h1 {
-    font-size: 1.5em;
+  .stats {
+    flex-direction: column;
+    gap: 8px;
   }
-  
-  .menu-btn {
-    font-size: 0.5em;
-    padding: 10px 16px;
+  canvas {
+    width: 95vw !important;
+    height: 60vh !important;
   }
 }

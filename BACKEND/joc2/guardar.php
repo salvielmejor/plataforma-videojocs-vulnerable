@@ -83,7 +83,7 @@ if ($res->num_rows > 0) {
         echo json_encode(['status' => 'error', 'message' => 'Error prepare insert progres: ' . $conn->error]);
         exit;
     }
-    $ins->bind_param("iiii", $usuari_id, $joc_id, $puntuacio, $puntuacio);
+    $ins->bind_param("iii", $usuari_id, $joc_id, $puntuacio);
     $ins->execute();
     if ($ins->error) {
         echo json_encode(['status' => 'error', 'message' => 'Error execució insert: ' . $ins->error]);

@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/session.php';
 if (!isset($_SESSION["usuario"])) {
     header("Location: ../index.php");
     exit();
@@ -37,24 +37,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     // PUJAR FOTO
-    //if (isset($_POST["subir_foto"]) && isset($_FILES["foto"]) && $_FILES["foto"]["error"] == UPLOAD_ERR_OK) {
-    //    $uploadsDir = "../uploads/";
-    //    if (!is_dir($uploadsDir)) {
-    //        mkdir($uploadsDir, 0755, true);
-    //    }
-    //
-    //    $filename = basename($_FILES["foto"]["name"]);
-    //    $targetFile = $uploadsDir . $filename;
-    //
-    //    if (move_uploaded_file($_FILES["foto"]["tmp_name"], $targetFile)) {
-    //        $ruta_relativa = "../uploads/" . $filename;
-    //        $sql_img = "UPDATE usuaris SET foto_perfil='$ruta_relativa' WHERE nom_usuari='$usuario'";
-    //        $conexion->query($sql_img);
-    //        $mensaje_subida = "Foto pujada correctament.";
-    //    } else {
-    //        $mensaje_subida = "Error en pujar la foto.";
-    //    }
-    //}
+    if (isset($_POST["subir_foto"]) && isset($_FILES["foto"]) && $_FILES["foto"]["error"] == UPLOAD_ERR_OK) {
+        $uploadsDir = "../uploads/";
+        if (!is_dir($uploadsDir)) {
+            mkdir($uploadsDir, 0755, true);
+        }
+    
+        $filename = basename($_FILES["foto"]["name"]);
+        $targetFile = $uploadsDir . $filename;
+    
+        if (move_uploaded_file($_FILES["foto"]["tmp_name"], $targetFile)) {
+            $ruta_relativa = "../uploads/" . $filename;
+            $sql_img = "UPDATE usuaris SET foto_perfil='$ruta_relativa' WHERE nom_usuari='$usuario'";
+            $conexion->query($sql_img);
+            $mensaje_subida = "Foto pujada correctament.";
+        } else {
+            $mensaje_subida = "Error en pujar la foto.";
+        }
+    }
 }
 
 // CONSULTAR DADES ACTUALS DE L'USUARI
@@ -118,7 +118,7 @@ if ($resultado && $resultado->num_rows > 0) {
                     <input type="file" name="foto" id="foto" accept="image/*" /><br/><br/>
 
                     <button type="submit" name="actualizar_datos">Actualitzar dades</button>
-                    <button type="submit" name="subir_foto">Eliminar Perfil</button>
+                    <button type="submit" name="subir_foto">Pujar foto</button>
                 </form>
 
                 <?php 

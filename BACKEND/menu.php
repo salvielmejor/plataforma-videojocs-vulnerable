@@ -1,3 +1,10 @@
+<?php
+require_once __DIR__ . '/session.php';
+if (!isset($_SESSION['usuari_id']) && !isset($_SESSION['usuario'])) {
+  header('Location: ../index.php');
+  exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="ca">
 <head>

@@ -1,6 +1,10 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+// API
+const API_BASE = 'http://172.18.33.242/projecte_marcsalvi/BACKEND/api.php';
+const GAME_NAME = 'Snake Pro';
+
 const gridSize = 20;
 let snake = [{ x: 200, y: 200 }];
 let direction = { x: 0, y: 0 };
@@ -8,8 +12,40 @@ let food = randomPosition();
 let score = 0;
 let level = 1;
 let speed = 100;
+let levelConfig = null; // configuración actual del nivel desde la API
 let particles = [];
 let gameActive = true;
+
+function defaultLevelConfig(lvl) {
+  const capped = Math.max(1, Math.min(lvl, 20));
+  // Velocidad base 120ms, reduce 8ms por nivel hasta 40ms mínimo
+  const speedMs = Math.max(40, 120 - (capped - 1) * 8);
+  return { speedMs };
+}
+
+async function loadLevelConfig(lvl) {
+  try {
+    const url = `${API_BASE}?joc_nom=${encodeURIComponent(GAME_NAME)}&nivell=${encodeURIComponent(lvl)}`;
+    const res = await fetch(url);
+    if (res.ok) {
+      return await res.json();
+    }
+    return defaultLevelConfig(lvl);
+  } catch (e) {
+    return defaultLevelConfig(lvl);
+  }
+}
+
+async function saveLevelConfig(lvl, config, nomNivell) {
+  try {
+    const url = `${API_BASE}?joc_nom=${encodeURIComponent(GAME_NAME)}&nivell=${encodeURIComponent(lvl)}&only_if_missing=1`;
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ configuracio: config, nom_nivell: nomNivell || `Nivell ${lvl}` })
+    });
+  } catch (_) {}
+}
 
 const scoreEl = document.getElementById("score");
 const levelEl = document.getElementById("level");
@@ -116,9 +152,18 @@ function draw() {
 
     if (score % 5 === 0) {
       level++;
-      speed = Math.max(40, speed - 10);
-      clearInterval(gameLoop);
-      gameLoop = setInterval(draw, speed);
+      // Cargar config de nivel y ajustar velocidad
+      (async () => {
+        levelConfig = await loadLevelConfig(level);
+        // Si la API no tiene, persistimos la por defecto para usos futuros
+        if (!levelConfig || typeof levelConfig.speedMs !== 'number') {
+          levelConfig = defaultLevelConfig(level);
+        }
+        saveLevelConfig(level, levelConfig);
+        speed = levelConfig.speedMs;
+        clearInterval(gameLoop);
+        gameLoop = setInterval(draw, speed);
+      })();
     }
   } else {
     snake.pop();
@@ -137,7 +182,20 @@ function draw() {
   updateStats();
 }
 
-let gameLoop = setInterval(draw, speed);
+let gameLoop = null;
+
+(async function bootstrap() {
+  // Cargar configuración del nivel 1
+  // 1) Pre-crear si falta (evita 404 en el primer GET)
+  await saveLevelConfig(level, defaultLevelConfig(level));
+  // 2) Leer de la API
+  levelConfig = await loadLevelConfig(level);
+  if (!levelConfig || typeof levelConfig.speedMs !== 'number') {
+    levelConfig = defaultLevelConfig(level);
+  }
+  speed = levelConfig.speedMs;
+  gameLoop = setInterval(draw, speed);
+})();
 
 // Función para manejar el fin del juego
 function gameOver() {

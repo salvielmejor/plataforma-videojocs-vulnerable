@@ -1,3 +1,10 @@
+<?php
+session_start();
+if (!isset($_SESSION["usuario"])) {
+    echo "<script>alert('⚠️ No estás logueado. Redirigiendo al login...'); window.location.href=' ../../index.php';</script>";
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -9,10 +16,8 @@
 <body>
     <div id="menu" class="menu">
         <h1>🍉 FRUIT NINJA 🍊</h1>
-        <div class="difficulty-buttons">
-            <button class="btn btn-easy" onclick="startGame('easy')">FÁCIL</button>
-            <button class="btn btn-medium" onclick="startGame('medium')">MEDIO</button>
-            <button class="btn btn-hard" onclick="startGame('hard')">DIFÍCIL</button>
+        <div class="menu-buttons">
+            <button class="btn btn-play" onclick="startGame()">▶️ Play</button>
         </div>
         <div class="instructions">
             <p>Corta las frutas con el cursor</p>
@@ -25,7 +30,7 @@
         <div class="game-header">
             <div class="score">Puntos: <span id="score">0</span></div>
             <div class="lives">Vidas: <span id="lives">3</span></div>
-            <div class="difficulty-label">Dificultad: <span id="difficulty-label"></span></div>
+            <div class="level-label">Nivel: <span id="level-label">1</span></div>
         </div>
         <canvas id="gameCanvas"></canvas>
         <div class="game-buttons">
