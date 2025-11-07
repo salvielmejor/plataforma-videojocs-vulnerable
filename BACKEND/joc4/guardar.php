@@ -33,6 +33,8 @@ if (!$data) {
 // Extraer datos enviados
 $puntuacio = intval($data["puntuacio"] ?? 0);
 $nivell_jugat = intval($data["nivell_id"] ?? 1);
+$nivell_maximo_alcanzado = intval($data["nivell_maximo_alcanzado"] ?? $nivell_jugat);
+$actualizar_nivel = isset($data["actualizar_nivel"]) ? (bool)$data["actualizar_nivel"] : false;
 
 // Obtener el ID del usuario desde la sesión (nombre de usuario)
 $nomUsuari = $_SESSION['usuario'];
@@ -73,16 +75,25 @@ try {
     
     if ($progres) {
         // Actualizar progreso existente
+        $nuevo_nivel = $progres['nivell_actual'];
+        
+        // Si se debe actualizar el nivel y el nivel máximo alcanzado es mayor al actual
+        if ($actualizar_nivel && $nivell_maximo_alcanzado > $progres['nivell_actual']) {
+            $nuevo_nivel = $nivell_maximo_alcanzado;
+        }
+        
         $stmt = $pdo->prepare("UPDATE progres_usuari SET 
+            nivell_actual = ?,
             puntuacio_maxima = GREATEST(puntuacio_maxima, ?), 
             partides_jugades = partides_jugades + 1,
             ultima_partida = NOW()
             WHERE usuari_id = ? AND joc_id = ?");
-        $stmt->execute([$puntuacio, $usuari_id, $joc_id]);
+        $stmt->execute([$nuevo_nivel, $puntuacio, $usuari_id, $joc_id]);
     } else {
         // Crear nuevo progreso
-        $stmt = $pdo->prepare("INSERT INTO progres_usuari (usuari_id, joc_id, nivell_actual, puntuacio_maxima, partides_jugades, ultima_partida) VALUES (?, ?, 1, ?, 1, NOW())");
-        $stmt->execute([$usuari_id, $joc_id, $puntuacio]);
+        $nivel_inicial = $nivell_maximo_alcanzado > 0 ? $nivell_maximo_alcanzado : 1;
+        $stmt = $pdo->prepare("INSERT INTO progres_usuari (usuari_id, joc_id, nivell_actual, puntuacio_maxima, partides_jugades, ultima_partida) VALUES (?, ?, ?, ?, 1, NOW())");
+        $stmt->execute([$usuari_id, $joc_id, $nivel_inicial, $puntuacio]);
     }
     
     echo json_encode([

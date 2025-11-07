@@ -48,8 +48,12 @@ try {
     }
     $stmt->close();
 
+    // Extraer nivel máximo alcanzado si se proporciona
+    $nivell_maximo_alcanzado = isset($data['nivell_maximo_alcanzado']) ? intval($data['nivell_maximo_alcanzado']) : 1;
+    $actualizar_nivel = isset($data['actualizar_nivel']) ? (bool)$data['actualizar_nivel'] : false;
+
     // Verificar si ya existe progreso para este usuario y juego
-    $sql_check = "SELECT id, puntuacio_maxima, partides_jugades FROM progres_usuari WHERE usuari_id=? AND joc_id=?";
+    $sql_check = "SELECT id, nivell_actual, puntuacio_maxima, partides_jugades FROM progres_usuari WHERE usuari_id=? AND joc_id=?";
     $stmt = $conn->prepare($sql_check);
     if (!$stmt) {
         throw new Exception("Error preparando check: " . $conn->error);
@@ -63,12 +67,18 @@ try {
         $row = $res->fetch_assoc();
         $max = max($row['puntuacio_maxima'], $puntuacio);
         $total = $row['partides_jugades'] + 1;
+        $nuevo_nivel = $row['nivell_actual'];
         
-        $upd = $conn->prepare("UPDATE progres_usuari SET puntuacio_maxima=?, partides_jugades=?, ultima_partida=NOW() WHERE usuari_id=? AND joc_id=?");
+        // Si se debe actualizar el nivel y el nivel máximo alcanzado es mayor al actual
+        if ($actualizar_nivel && $nivell_maximo_alcanzado > $row['nivell_actual']) {
+            $nuevo_nivel = $nivell_maximo_alcanzado;
+        }
+        
+        $upd = $conn->prepare("UPDATE progres_usuari SET nivell_actual=?, puntuacio_maxima=?, partides_jugades=?, ultima_partida=NOW() WHERE usuari_id=? AND joc_id=?");
         if (!$upd) {
             throw new Exception("Error preparando update: " . $conn->error);
         }
-        $upd->bind_param("iiii", $max, $total, $usuari_id, $joc_id);
+        $upd->bind_param("iiiii", $nuevo_nivel, $max, $total, $usuari_id, $joc_id);
         if (!$upd->execute()) {
             throw new Exception("Error ejecutando update: " . $upd->error);
         }
@@ -77,11 +87,12 @@ try {
         $message = $max > $row['puntuacio_maxima'] ? 'Nueva puntuación máxima!' : 'Partida guardada';
     } else {
         // Crear nuevo progreso
-        $ins = $conn->prepare("INSERT INTO progres_usuari (usuari_id, joc_id, nivell_actual, puntuacio_maxima, partides_jugades, ultima_partida) VALUES (?, ?, 1, ?, 1, NOW())");
+        $nivel_inicial = $nivell_maximo_alcanzado > 0 ? $nivell_maximo_alcanzado : 1;
+        $ins = $conn->prepare("INSERT INTO progres_usuari (usuari_id, joc_id, nivell_actual, puntuacio_maxima, partides_jugades, ultima_partida) VALUES (?, ?, ?, ?, 1, NOW())");
         if (!$ins) {
             throw new Exception("Error preparando insert: " . $conn->error);
         }
-        $ins->bind_param("iii", $usuari_id, $joc_id, $puntuacio);
+        $ins->bind_param("iiii", $usuari_id, $joc_id, $nivel_inicial, $puntuacio);
         if (!$ins->execute()) {
             throw new Exception("Error ejecutando insert: " . $ins->error);
         }

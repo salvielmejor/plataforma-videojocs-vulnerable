@@ -67,12 +67,17 @@ const fruitEmojis = ['🍎', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '�
 const fruitColors = ['#ff6b6b', '#ffa500', '#ffd700', '#ffff00', '#90ee90', '#9370db', '#ff69b4', '#ffb6c1', '#98fb98', '#ffd700'];
 
 async function startGame() {
+    // Cargar el progreso del usuario
+    let userProgress = await loadUserProgress();
+    const startingLevel = userProgress.nivell_actual || 1;
+    
     gameState.score = 0;
     gameState.lives = 3;
-    gameState.level = 1;
+    gameState.level = startingLevel;
     gameState.fruits = [];
     gameState.particles = [];
     gameState.isPlaying = true;
+    gameState.initialLevel = startingLevel; // Guardar nivel inicial para detectar si se supera
     mouseTrail = [];
     lastMousePos = { x: 0, y: 0 };
 
@@ -84,7 +89,7 @@ async function startGame() {
 
     setupCanvas();
     updateUI();
-    // Cargar config del nivel 1 desde API (o usar por defecto)
+    // Cargar config del nivel desde API (o usar por defecto)
     gameState.currentConfig = await loadLevelConfig(gameState.level);
     // Guardar la config calculada si no existía (no distinguimos 404, ahorraremos una llamada)
     saveLevelConfig(gameState.level, gameState.currentConfig);
@@ -308,25 +313,74 @@ function updateUI() {
 function handleScoreChange() {
     const previousLevel = gameState.level;
     const calculatedLevel = Math.min(1 + Math.floor(gameState.score / 100), gameState.maxLevel);
-    gameState.level = calculatedLevel;
+    // El nivel nunca debe ser menor que el nivel inicial del usuario
+    const minLevel = gameState.initialLevel || 1;
+    gameState.level = Math.max(calculatedLevel, minLevel);
     updateUI();
     if (gameState.level !== previousLevel) {
         // Cuando sube el nivel, cargar la configuración correspondiente y persistirla
         (async () => {
             gameState.currentConfig = await loadLevelConfig(gameState.level);
             saveLevelConfig(gameState.level, gameState.currentConfig);
+            // Si el nivel supera el nivel inicial del usuario, actualizar inmediatamente
+            if (gameState.level > minLevel) {
+                await updateLevelProgress(gameState.level);
+            }
         })();
+    }
+}
+
+async function updateLevelProgress(newLevel) {
+    try {
+        const response = await fetch('actualizar_nivel.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ nivell_actual: newLevel })
+        });
+        const data = await response.json();
+        if (data.success) {
+            console.log('Nivel actualizado a:', newLevel);
+        }
+    } catch (err) {
+        console.error('Error al actualizar nivel:', err);
+    }
+}
+
+async function loadUserProgress() {
+    try {
+        const response = await fetch('obtener_progreso.php');
+        const data = await response.json();
+        if (data.success) {
+            return {
+                nivell_actual: data.nivell_actual || 1,
+                puntuacio_maxima: data.puntuacio_maxima || 0
+            };
+        }
+        return { nivell_actual: 1, puntuacio_maxima: 0 };
+    } catch (err) {
+        console.error('Error al cargar progreso:', err);
+        return { nivell_actual: 1, puntuacio_maxima: 0 };
     }
 }
 
 async function saveGameResult(score, level) {
     try {
+        // Determinar el nivel máximo alcanzado durante la partida
+        const maxLevelReached = Math.max(gameState.initialLevel || 1, level);
+        
         const response = await fetch('guardar.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ puntuacio: score, nivell_id: level })
+            body: JSON.stringify({ 
+                puntuacio: score, 
+                nivell_id: level,
+                nivell_maximo_alcanzado: maxLevelReached,
+                actualizar_nivel: maxLevelReached > (gameState.initialLevel || 1)
+            })
         });
         const data = await response.json();
         if (!data.success) {

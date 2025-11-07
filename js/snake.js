@@ -15,6 +15,7 @@ let speed = 100;
 let levelConfig = null; // configuración actual del nivel desde la API
 let particles = [];
 let gameActive = true;
+let initialLevel = 1; // Nivel inicial del usuario
 
 function defaultLevelConfig(lvl) {
   const capped = Math.max(1, Math.min(lvl, 20));
@@ -47,11 +48,51 @@ async function saveLevelConfig(lvl, config, nomNivell) {
   } catch (_) {}
 }
 
+async function loadUserProgress() {
+  try {
+    const response = await fetch('obtener_progreso.php');
+    const data = await response.json();
+    if (data.success) {
+      return {
+        nivell_actual: data.nivell_actual || 1,
+        puntuacio_maxima: data.puntuacio_maxima || 0
+      };
+    }
+    return { nivell_actual: 1, puntuacio_maxima: 0 };
+  } catch (err) {
+    console.error('Error al cargar progreso:', err);
+    return { nivell_actual: 1, puntuacio_maxima: 0 };
+  }
+}
+
+async function updateLevelProgress(newLevel) {
+  try {
+    const response = await fetch('actualizar_nivel.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ nivell_actual: newLevel })
+    });
+    const data = await response.json();
+    if (data.success) {
+      console.log('Nivel actualizado a:', newLevel);
+    }
+  } catch (err) {
+    console.error('Error al actualizar nivel:', err);
+  }
+}
+
 const scoreEl = document.getElementById("score");
 const levelEl = document.getElementById("level");
 const speedEl = document.getElementById("speed");
 
 document.addEventListener("keydown", (e) => {
+  // Si el juego no está activo y no hay un gameLoop, iniciarlo
+  if (!gameLoop && gameActive) {
+    gameLoop = setInterval(draw, speed);
+  }
+  
   switch (e.key) {
     case "ArrowUp": direction = { x: 0, y: -gridSize }; break;
     case "ArrowDown": direction = { x: 0, y: gridSize }; break;
@@ -151,7 +192,10 @@ function draw() {
     spawnParticles(head.x, head.y);
 
     if (score % 5 === 0) {
-      level++;
+      const newLevel = Math.min(1 + Math.floor(score / 5), 20);
+      // El nivel nunca debe ser menor que el nivel inicial
+      level = Math.max(newLevel, initialLevel);
+      
       // Cargar config de nivel y ajustar velocidad
       (async () => {
         levelConfig = await loadLevelConfig(level);
@@ -163,6 +207,12 @@ function draw() {
         speed = levelConfig.speedMs;
         clearInterval(gameLoop);
         gameLoop = setInterval(draw, speed);
+        
+        // Si el nivel supera el nivel inicial, actualizar en la base de datos
+        if (level > initialLevel) {
+          await updateLevelProgress(level);
+          initialLevel = level; // Actualizar el nivel inicial para futuras comparaciones
+        }
       })();
     }
   } else {
@@ -185,7 +235,15 @@ function draw() {
 let gameLoop = null;
 
 (async function bootstrap() {
-  // Cargar configuración del nivel 1
+  // Cargar el progreso del usuario
+  let userProgress = await loadUserProgress();
+  initialLevel = userProgress.nivell_actual || 1;
+  level = initialLevel;
+  
+  // Calcular score inicial basado en el nivel (5 puntos por nivel)
+  score = (initialLevel - 1) * 5;
+  
+  // Cargar configuración del nivel inicial
   // 1) Pre-crear si falta (evita 404 en el primer GET)
   await saveLevelConfig(level, defaultLevelConfig(level));
   // 2) Leer de la API
@@ -194,7 +252,10 @@ let gameLoop = null;
     levelConfig = defaultLevelConfig(level);
   }
   speed = levelConfig.speedMs;
-  gameLoop = setInterval(draw, speed);
+  updateStats();
+  
+  // Solo iniciar el juego si el usuario presiona una tecla
+  // No auto-iniciar para permitir que el usuario vea su nivel
 })();
 
 // Función para manejar el fin del juego
@@ -224,10 +285,16 @@ async function saveScore(finalScore) {
   }
 
   try {
+    // Determinar el nivel máximo alcanzado durante la partida
+    const maxLevelReached = Math.max(initialLevel, level);
+    const shouldUpdateLevel = maxLevelReached > initialLevel;
+    
     console.log('Enviando datos:', {
       usuari_id: usuarioId,
       joc_id: 3,
-      puntuacio: finalScore
+      puntuacio: finalScore,
+      nivell_maximo_alcanzado: maxLevelReached,
+      actualizar_nivel: shouldUpdateLevel
     });
 
     const response = await fetch('guardar.php', {
@@ -238,7 +305,9 @@ async function saveScore(finalScore) {
       body: JSON.stringify({
         usuari_id: usuarioId,
         joc_id: 3,
-        puntuacio: finalScore
+        puntuacio: finalScore,
+        nivell_maximo_alcanzado: maxLevelReached,
+        actualizar_nivel: shouldUpdateLevel
       })
     });
     
@@ -274,19 +343,31 @@ async function saveScore(finalScore) {
 }
 
 // Función para reiniciar el juego
-function restartGame() {
+async function restartGame() {
   const gameOverDiv = document.getElementById('gameOver');
   gameOverDiv.style.display = 'none';
+  
+  // Cargar el progreso del usuario de nuevo (por si se actualizó)
+  let userProgress = await loadUserProgress();
+  initialLevel = userProgress.nivell_actual || 1;
   
   // Reiniciar variables del juego
   gameActive = true;
   snake = [{ x: 200, y: 200 }];
   direction = { x: 0, y: 0 };
-  score = 0;
-  level = 1;
-  speed = 100;
+  score = (initialLevel - 1) * 5; // Score inicial basado en el nivel
+  level = initialLevel;
   food = randomPosition();
   particles = [];
+  
+  // Cargar configuración del nivel inicial
+  await saveLevelConfig(level, defaultLevelConfig(level));
+  levelConfig = await loadLevelConfig(level);
+  if (!levelConfig || typeof levelConfig.speedMs !== 'number') {
+    levelConfig = defaultLevelConfig(level);
+  }
+  speed = levelConfig.speedMs;
+  updateStats();
   
   // Limpiar canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);

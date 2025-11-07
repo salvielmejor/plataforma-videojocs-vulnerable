@@ -1,7 +1,8 @@
 <?php
 session_start();
 if (!isset($_SESSION['usuari_id'])) {
-  header("Location: ../login.php");
+  // Mostrar mensaje de error y redirigir
+  echo "<script>alert('⚠️ No estàs connectat. Redirigint al menú...'); window.location.href='../menu.php';</script>";
   exit();
 }
 
@@ -86,8 +87,50 @@ if (!isset($_SESSION['nivell'])) {
             return diff === 'facil' ? 1 : (diff === 'mitja' ? 2 : 3);
         }
 
+        function difficultyFromLevel(level) {
+            if (level >= 3) return 'dificil';
+            if (level >= 2) return 'mitja';
+            return 'facil';
+        }
+
         function fallbackConfig(diff) {
             return { ...config[diff] };
+        }
+
+        async function loadUserProgress() {
+            try {
+                const response = await fetch('obtener_progreso.php');
+                const data = await response.json();
+                if (data.success) {
+                    return {
+                        nivell_actual: data.nivell_actual || 1,
+                        puntuacio_maxima: data.puntuacio_maxima || 0
+                    };
+                }
+                return { nivell_actual: 1, puntuacio_maxima: 0 };
+            } catch (err) {
+                console.error('Error al cargar progreso:', err);
+                return { nivell_actual: 1, puntuacio_maxima: 0 };
+            }
+        }
+
+        async function updateLevelProgress(newLevel) {
+            try {
+                // Actualizar nivel en el backend cuando se supera
+                const response = await fetch('actualizar_nivel.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ nivell_actual: newLevel })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    console.log('Nivel actualizado a:', newLevel);
+                }
+            } catch (err) {
+                console.error('Error al actualizar nivel:', err);
+            }
         }
 
         async function loadConfigByDifficulty(diff) {
@@ -105,13 +148,15 @@ if (!isset($_SESSION['nivell'])) {
         async function saveConfigIfMissing(diff, cfg) {
             const lvl = levelFromDifficulty(diff);
             try {
-                const url = `${API_BASE}?joc_nom=${encodeURIComponent(GAME_NAME)}&nivell=${lvl}&only_if_missing=1`;
+                const url = `${API_BASE}?joc_nom=${encodeURIComponent(GAME_NAME)}&nivell=${lvl}`;
                 await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ configuracio: cfg, nom_nivell: diff.charAt(0).toUpperCase() + diff.slice(1) })
+                    body: JSON.stringify({ configuracio: cfg, nom_nivell: `Nivell ${lvl}` })
                 });
-            } catch (_) {}
+            } catch (err) {
+                console.error('No s\'ha pogut guardar la configuració del nivell', err);
+            }
         }
 
         const canvas = document.getElementById('gameCanvas');
@@ -120,6 +165,7 @@ if (!isset($_SESSION['nivell'])) {
         let currentDifficulty = 'facil', currentConfig = null, spawnInterval = null;
         let mouseX = 0, mouseY = 0;
         let startTime = 0;
+        let initialLevel = 1; // Nivel inicial del usuario
 
         class Star {
             constructor(cfg) {
@@ -134,19 +180,29 @@ if (!isset($_SESSION['nivell'])) {
         }
 
         async function startGame() {
+            // Cargar el progreso del usuario
+            let userProgress = await loadUserProgress();
+            initialLevel = userProgress.nivell_actual || 1;
+            
+            // Determinar la dificultad inicial basada en el nivel
+            const initialDifficulty = difficultyFromLevel(initialLevel);
+            currentDifficulty = initialDifficulty;
+            
             document.getElementById('menuScreen').classList.add('hidden');
             document.getElementById('gameScreen').classList.remove('hidden');
-            currentDifficulty = 'facil';
+            
             // Pre-crear en BD si falta y cargar
-            await saveConfigIfMissing('facil', fallbackConfig('facil'));
-            currentConfig = await loadConfigByDifficulty('facil');
+            await saveConfigIfMissing(initialDifficulty, fallbackConfig(initialDifficulty));
+            currentConfig = await loadConfigByDifficulty(initialDifficulty);
             score = 0;
             lives = 3;
             stars = [];
             gameActive = true;
             startTime = Date.now();
             document.getElementById('score').textContent = score;
-            document.getElementById('level').textContent = 'Fàcil';
+            
+            // Mostrar etiqueta como "Nivell X"
+            document.getElementById('level').textContent = `Nivell ${levelFromDifficulty(initialDifficulty)}`;
             updateLivesDisplay();
             document.getElementById('win-message').classList.add('hidden');
             document.getElementById('level-up-message').classList.add('hidden');
@@ -159,7 +215,8 @@ if (!isset($_SESSION['nivell'])) {
         }
 
         function updateLivesDisplay() {
-            const livesText = '❤️'.repeat(lives);
+            const livesSafe = Math.max(0, lives);
+            const livesText = '❤️'.repeat(livesSafe);
             document.getElementById('lives').textContent = livesText || '💀';
             
             // Efecto visual cuando pierdes vida
@@ -172,7 +229,8 @@ if (!isset($_SESSION['nivell'])) {
         }
 
         function loseLife() {
-            lives--;
+            if (!gameActive) return;
+            lives = Math.max(0, lives - 1);
             updateLivesDisplay();
             
             if (lives <= 0) {
@@ -182,12 +240,23 @@ if (!isset($_SESSION['nivell'])) {
 
         function checkLevelUp() {
             let newDifficulty = currentDifficulty;
+            let newLevel = initialLevel;
             
-            if (score >= 150 && currentDifficulty !== 'dificil') {
+            // Calcular nivel basado en la puntuación
+            if (score >= 150) {
                 newDifficulty = 'dificil';
-            } else if (score >= 50 && currentDifficulty === 'facil') {
+                newLevel = 3;
+            } else if (score >= 50) {
                 newDifficulty = 'mitja';
+                newLevel = 2;
+            } else {
+                newDifficulty = 'facil';
+                newLevel = 1;
             }
+            
+            // Asegurar que el nivel nunca baje del nivel inicial
+            newLevel = Math.max(newLevel, initialLevel);
+            newDifficulty = difficultyFromLevel(newLevel);
             
             if (newDifficulty !== currentDifficulty) {
                 currentDifficulty = newDifficulty;
@@ -199,15 +268,20 @@ if (!isset($_SESSION['nivell'])) {
                     spawnInterval = setInterval(() => { 
                         if (gameActive) stars.push(new Star(currentConfig)); 
                     }, currentConfig.freq);
+                    
+                    // Si el nivel supera el nivel inicial, actualizar en la base de datos
+                    if (newLevel > initialLevel) {
+                        await updateLevelProgress(newLevel);
+                        initialLevel = newLevel; // Actualizar el nivel inicial para futuras comparaciones
+                    }
                 })();
                 
-                // Actualizar nivel en HUD
-                const levelNames = { 'facil': 'Fàcil', 'mitja': 'Mitjana', 'dificil': 'Difícil' };
-                document.getElementById('level').textContent = levelNames[newDifficulty];
+                // Actualizar nivel en HUD (formato "Nivell X")
+                document.getElementById('level').textContent = `Nivell ${levelFromDifficulty(newDifficulty)}`;
                 
                 // Mostrar mensaje de nivel
                 const levelMsg = document.getElementById('level-up-message');
-                levelMsg.textContent = `🎉 Nivell ${levelNames[newDifficulty]} desbloquejat! 🎉`;
+                levelMsg.textContent = `🎉 Nivell ${levelFromDifficulty(newDifficulty)} desbloquejat! 🎉`;
                 levelMsg.classList.remove('hidden');
                 setTimeout(() => levelMsg.classList.add('hidden'), 2000);
                 
@@ -255,7 +329,10 @@ if (!isset($_SESSION['nivell'])) {
             msg.classList.remove('hidden');
 
             // Guardar en la base de datos
-            const joc_id = 1; // ID del juego "Atrapa les Estrelles"
+            const joc_id = 2; // ID del juego "Atrapa les Estrelles"
+            const finalLevel = score >= 150 ? 3 : (score >= 50 ? 2 : 1);
+            const maxLevelReached = Math.max(finalLevel, initialLevel);
+            const shouldUpdateLevel = maxLevelReached > initialLevel;
 
             fetch('guardar.php', {
                 method: 'POST',
@@ -264,10 +341,19 @@ if (!isset($_SESSION['nivell'])) {
                     usuari_id: usuari_id,
                     joc_id: joc_id,
                     puntuacio: score,
-                    durada: durada
+                    durada: durada,
+                    nivell_maximo_alcanzado: maxLevelReached,
+                    actualizar_nivel: shouldUpdateLevel
                 })
             })
-            .then(res => res.json())
+            .then(async res => {
+                const text = await res.text();
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    throw new Error(`Resposta no JSON: ${text.substring(0,200)}`);
+                }
+            })
             .then(data => {
                 if (data.status === 'ok') {
                     console.log('✅ Resultat guardat correctament');
